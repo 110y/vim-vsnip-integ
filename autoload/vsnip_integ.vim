@@ -61,7 +61,7 @@ function! vsnip_integ#do_complete_done(context) abort
   \   'complete_position': get(a:context, 'complete_position', v:null),
   \   'apply_additional_text_edits': get(a:context, 'apply_additional_text_edits', v:false),
   \ }
-  call feedkeys("\<Plug>(vsnip_integ:on_complete_done_after)")
+  call s:on_complete_done_after()
 endfunction
 
 "
@@ -87,7 +87,7 @@ function! vsnip_integ#on_complete_done(completed_item) abort
     \   'completed_item': a:completed_item,
     \   'apply_additional_text_edits': v:true,
     \ })
-    call feedkeys("\<Plug>(vsnip_integ:on_complete_done_after)")
+    call s:on_complete_done_after()
   endif
 endfunction
 
@@ -315,4 +315,3 @@ endfunction
 function! s:trim_unmeaning_tabstop(text) abort
   return substitute(a:text, '\%(\$0\|\${0}\)$', '', 'g')
 endfunction
-
