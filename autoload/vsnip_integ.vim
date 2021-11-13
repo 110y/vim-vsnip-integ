@@ -95,6 +95,10 @@ endfunction
 " on_complete_done_after
 "
 function! s:on_complete_done_after() abort
+  if s:context.completed_item.kind !=# 'Snippet'
+    return
+  endif
+
   if s:stop_complete_done_after | return '' | endif
 
   " Fix lnum for external additionalTextEdits
