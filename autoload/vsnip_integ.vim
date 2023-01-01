@@ -116,7 +116,7 @@ function! s:on_complete_done_after() abort
 
   " Expand snippet.
   if strlen(l:expand_text) > 0
-    call vsnip#anonymous(l:expand_text)
+    call vsnip#anonymous(printf("\t%s", l:expand_text))
   endif
 
   return ''
