@@ -207,11 +207,12 @@ function! s:remove_completed_text(context) abort
         \   'end': l:lsp_done_pos
         \ }
 
+  " NOTE: commented out because it causes an unexpected behavior.
   " Support `textEdit` range for LSP CompletionItem.
-  if !empty(l:completion_item) && has_key(l:completion_item, 'textEdit') && type(l:completion_item.textEdit) == type({})
-    let l:range.start.character = min([l:range.start.character, l:completion_item.textEdit.range.start.character])
-    let l:range.end.character = max([l:range.end.character, l:completion_item.textEdit.range.end.character])
-  endif
+  " if !empty(l:completion_item) && has_key(l:completion_item, 'textEdit') && type(l:completion_item.textEdit) == type({})
+  "   let l:range.start.character = min([l:range.start.character, l:completion_item.textEdit.range.start.character])
+  "   let l:range.end.character = max([l:range.end.character, l:completion_item.textEdit.range.end.character])
+  " endif
 
   " Remove range.
   call s:TextEdit.apply(bufnr('%'), [{
