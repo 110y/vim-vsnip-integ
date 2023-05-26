@@ -89,6 +89,13 @@ endfunction
 " on_complete_done_after
 "
 function! s:on_complete_done_after() abort
+  " ddc now fires (Pum)CompleteDone even if the completion is canceled.
+  " https://github.com/Shougo/ddc.vim/commit/418048a18608dcbb9b5e8e713fd13463dcfc7d53
+  " To prevent expand snippet unexpectedly, check the current mode. (if the completion is canceled, the mode is 'i')
+  if mode() !=# 'n'
+    return
+  endif
+
   if s:context.completed_item.kind !=# 'Snippet'
     return
   endif
