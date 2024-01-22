@@ -4,6 +4,7 @@ let s:definition = {
 \   'lcn': { -> exists('g:LanguageClient_serverCommands') },
 \   'asyncomplete': { -> exists('g:asyncomplete_loaded') },
 \   'mucomplete': { -> exists('g:loaded_mucomplete') },
+\   'ddc': { -> s:runtimepath("autoload/ddc.vim") },
 \   'easycomplete': { -> exists('g:easycomplete_default_plugin_init') },
 \   'yegappan_lsp': { -> s:runtimepath('autoload/lsp/lspserver.vim') },
 \ }
@@ -34,4 +35,3 @@ endfunction
 function! s:runtimepath(path) abort
   return !empty(globpath(&runtimepath, a:path))
 endfunction
-
