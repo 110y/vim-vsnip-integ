@@ -155,10 +155,11 @@ function! s:get_expand_text(context) abort
     if has_key(l:completion_item, 'textEdit') && type(l:completion_item.textEdit) == type({})
       let l:lsp_done_pos = s:Position.vim_to_lsp('%', [l:done_pos[1], l:done_pos[2] + l:done_pos[3]])
       let l:text_edit = copy(l:completion_item.textEdit)
-      let l:text_edit.range.start.character = min([l:lsp_done_pos['character'] - strchars(l:word), l:text_edit.range.start.character])
-      let l:text_edit.range.end.character = max([l:lsp_done_pos['character'], l:text_edit.range.end.character])
-      let l:text_edit_before = strcharpart(l:done_line, 0, l:completion_item.textEdit.range.start.character)
-      let l:text_edit_after = strcharpart(l:done_line, l:completion_item.textEdit.range.end.character, strchars(l:done_line) - l:completion_item.textEdit.range.end.character)
+      let l:range = s:get_range(l:text_edit)
+      let l:range.start.character = min([l:lsp_done_pos['character'] - strchars(l:word), l:range.start.character])
+      let l:range.end.character = max([l:lsp_done_pos['character'], l:range.end.character])
+      let l:text_edit_before = strcharpart(l:done_line, 0, l:range.start.character)
+      let l:text_edit_after = strcharpart(l:done_line, l:range.end.character, strchars(l:done_line) - l:range.end.character)
       if l:done_line !=# l:text_edit_before . s:trim_unmeaning_tabstop(l:completion_item.textEdit.newText) . l:text_edit_after
         return l:completion_item.textEdit.newText
       endif
@@ -170,6 +171,14 @@ function! s:get_expand_text(context) abort
   endif
 
   return ''
+endfunction
+
+function! s:get_range(text_edit) abort
+  " TextEdit | InsertReplaceEdit
+  return has_key(a:text_edit, 'range')
+        \ ? a:text_edit.range
+        \ : g:vsnip_integ_confirm_behavior ==# 'insert'
+        \ ? a:text_edit.insert : a:text_edit.replace
 endfunction
 
 "
@@ -222,8 +231,9 @@ function! s:remove_completed_text(context) abort
   " NOTE: commented out because it causes an unexpected behavior.
   " Support `textEdit` range for LSP CompletionItem.
   " if !empty(l:completion_item) && has_key(l:completion_item, 'textEdit') && type(l:completion_item.textEdit) == type({})
-  "   let l:range.start.character = min([l:range.start.character, l:completion_item.textEdit.range.start.character])
-  "   let l:range.end.character = max([l:range.end.character, l:completion_item.textEdit.range.end.character])
+  "   let l:lsp_range = s:get_range(l:completion_item.textEdit)
+  "   let l:range.start.character = min([l:range.start.character, l:lsp_range.start.character])
+  "   let l:range.end.character = max([l:range.end.character, l:lsp_range.end.character])
   " endif
 
   " Remove range.
@@ -248,12 +258,6 @@ function! s:extract_user_data(completed_item) abort
     let l:user_data = a:completed_item.user_data
     if type(l:user_data) == type('')
       let l:user_data = json_decode(l:user_data)
-    elseif s:has_key(l:user_data, 'lspitem')
-      " ddc-nvim-lsp
-      return {
-      \   'sources': ['ddc'],
-      \   'completion_item': json_decode(l:user_data.lspitem)
-      \ }
     endif
 
     " Support dict only.
